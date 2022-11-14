@@ -1,0 +1,57 @@
+#include<pthread.h>
+#include<stdio.h>
+#include<unistd.h>
+
+//Declare functions
+void *function1();
+void *function2();
+
+//decalre and initialise shared variable
+int var=1;
+
+int main()
+{
+    //create 2 threads
+    pthread_t t1, t2; 
+    pthread_create(&t1, NULL, function1, NULL);
+    pthread_create(&t2, NULL, function2, NULL);
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+
+    //output the value of shared variable after the threads have finished their operations
+    printf("Shared Variable value is %d\n", var);
+}
+
+void *function1() 
+{
+    // read the shared value, store it in a local variable
+    int x;
+    x=var;
+
+    // multiply the local variable by 10
+    printf("T1 has read value of shared variable as %d\n", x);
+    x=x*10;
+    printf("T1 has updated it's copy of the shared variable to be %d\n", x);
+    // sleep to allow next thread, t2 to run
+    sleep(1); 
+
+    // write the value of the local variable to the shared variable
+    var = x;
+    printf("Value of shared variable updated by T1 is %d\n", var);
+}
+void *function2()
+{
+    // read the shared value, store in in a local variable 
+    int y;
+    y=var;
+
+    // subtract 10 from local variable
+    printf("T2 has read value of shared variable as %d\n", y);
+    y=y-10;
+    printf("T2 has updated it's copy of the shared variable to be %d\n", y);
+    sleep(1);
+
+    // write the value of the local variable to the shared variable
+    var = y;
+    printf("Value of shared variable updated by T2 is %d\n", var);
+}
